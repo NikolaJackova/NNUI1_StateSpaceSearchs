@@ -6,62 +6,29 @@ using System.Threading.Tasks;
 
 namespace NNUI1_01.AStarSearch
 {
-    class AStarNode
+    class AStarNode : Node
     {
-        private static int id = 1;
-        public int Id { get; set; }
-        public Action? Action { get; set; }
-        public AStarNode Parent { get; set; }
-        public State State { get; set; }
-        public int Depth { get; set; }
         public int PathEval { get; set; } //odhad ceny
         public int PathTotal { get { return Depth + PathEval; } }// hloubka + PathEval
 
-        public AStarNode(Action? action, AStarNode parent, State state, int depth, int pathEval)
+        public AStarNode(Action? action, AStarNode parent, State state, int depth) : base(action, parent, state, depth)
         {
-            Id = id++;
-            Action = action;
-            Parent = parent;
-            State = state;
-            Depth = depth;
-            PathEval = pathEval;
         }
-
-        public AStarNode(AStarNode node, Action? action)
+        public override Node CreateNewNodeFromOrigin(Action? action)
         {
-            State = new State(new int[AStarSearchSystem.Rows, AStarSearchSystem.Columns]);
-            for (int i = 0; i < AStarSearchSystem.Rows; i++)
+            State state = new State(new int[State.Board.GetLength(0), State.Board.GetLength(1)]);
+            for (int i = 0; i < State.Board.GetLength(0); i++)
             {
-                for (int j = 0; j < AStarSearchSystem.Columns; j++)
+                for (int j = 0; j < State.Board.GetLength(1); j++)
                 {
-                    State.Board[i, j] = node.State.Board[i, j];
+                    state.Board[i, j] = State.Board[i, j];
                 }
             }
-            Parent = node;
-            Action = action;
-            Depth = node.Depth + 1;
-            Id = id++;
+            return new AStarNode(action, this, state, Depth + 1);
         }
-
-        public bool Equals(AStarNode obj)
-        {
-            return State.Equals(obj.State);
-        }
-
         public override string ToString()
         {
-            string node = "-------------- -\n";
-            node += "[" + Id + " " + Action.ToString() + " " + Depth + " " + PathEval + " " + PathTotal + " ]\n";
-            for (int i = 0; i < AStarSearchSystem.Rows; i++)
-            {
-                node += "[";
-                for (int j = 0; j < AStarSearchSystem.Columns; j++)
-                {
-                    node += State.Board[i, j].ToString() + " ";
-                }
-                node += "]\n";
-            }
-            return node;
+            return base.ToString() + "\nPath Eval: " + PathEval + " Path Total: " + PathTotal + "\n";
         }
     }
 }

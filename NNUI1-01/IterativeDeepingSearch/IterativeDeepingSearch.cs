@@ -8,16 +8,18 @@ namespace NNUI1_01.IterativeDeepingSearch
 {
     class IterativeDeepingSearch
     {
-        public IterativeDeepingSearchSystem System { get; set; }
+        public SearchSystemController<IterativeDeepingNode> IterativeDeepingSearchSystem { get; set; }
         public int Limit { get; set; }
         public Stack<IterativeDeepingNode> Fringe { get; set; }
         public IList<IterativeDeepingNode> Path { get; set; }
-        public IterativeDeepingSearch()
+        public IterativeDeepingNode InitNode { get; set; }
+        public IterativeDeepingSearch(IterativeDeepingNode initNode, State finalState)
         {
-            System = new IterativeDeepingSearchSystem();
+            IterativeDeepingSearchSystem = new SearchSystemController<IterativeDeepingNode>(finalState, 3);
             Fringe = new Stack<IterativeDeepingNode>();
             Path = new List<IterativeDeepingNode>();
             Limit = 0;
+            InitNode = initNode;
         }
         public void Search()
         {
@@ -30,20 +32,20 @@ namespace NNUI1_01.IterativeDeepingSearch
         {
             int depth = 0;
             Path.Clear();
-            Fringe.Push(System.InitNode);
+            Fringe.Push(InitNode);
             while (depth <= Limit)
             {
                 IterativeDeepingNode node = Fringe.Pop();
                 Path.Add(node);
-                IList<IterativeDeepingNode> children = System.Successor(node);
+                IList<IterativeDeepingNode> children = IterativeDeepingSearchSystem.Successor(node);
                 foreach (var item in children)
                 {
-                    if (!ExistsInPath(item))
+                    if (!SearchHelper.ExistsInList(item, Path))
                     {
                         Fringe.Push(item);
                     }
                 }
-                if (System.IsFinalState(node))
+                if (IterativeDeepingSearchSystem.IsFinalState(node))
                 {
                     Console.WriteLine(node.ToString() + " " + depth);
                     Console.WriteLine("I find solution!");
@@ -53,17 +55,6 @@ namespace NNUI1_01.IterativeDeepingSearch
                 depth++;
             }
             Limit++;
-        }
-        private bool ExistsInPath(IterativeDeepingNode nodeA)
-        {
-            foreach (var item in Path)
-            {
-                if (nodeA.Equals(item))
-                {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 }

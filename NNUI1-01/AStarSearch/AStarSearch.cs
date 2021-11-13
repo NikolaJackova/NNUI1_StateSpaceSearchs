@@ -6,13 +6,15 @@ namespace NNUI1_01.AStarSearch
 {
     class AStarSearch
     {
-        public AStarSearchSystem AStarSearchSystem { get; set; }
+        public SearchSystemController<AStarNode> AStarSearchSystem { get; set; }
         public SimplePriorityQueue<AStarNode> Fringe { get; set; }
+        public AStarNode InitNode { get; set; }
         public IList<AStarNode> Explored { get; set; }
 
         public AStarSearch(AStarNode initNode, State finalState)
         {
-            AStarSearchSystem = new AStarSearchSystem(initNode, finalState, (Action[]) Enum.GetValues(typeof(Action)));
+            AStarSearchSystem = new SearchSystemController<AStarNode>(finalState, 3);
+            InitNode = initNode;
             Fringe = new SimplePriorityQueue<AStarNode>();
             Explored = new List<AStarNode>();
         }
@@ -20,7 +22,7 @@ namespace NNUI1_01.AStarSearch
         public void Search()
         {
             int iteration = 0;
-            Fringe.Enqueue(AStarSearchSystem.InitNode, AStarSearchSystem.InitNode.PathTotal);
+            Fringe.Enqueue(InitNode, InitNode.PathTotal);
             while (true)
             {
                 AStarNode node = Fringe.Dequeue();
@@ -28,7 +30,7 @@ namespace NNUI1_01.AStarSearch
                 IList<AStarNode> children = AStarSearchSystem.Successor(node);
                 foreach (var item in children)
                 {
-                    if (!ExistsInExplored(item) && !ExistsInFringe(item))
+                    if (!SearchHelper.ExistsInList(item, Explored) && !SearchHelper.ExistsInFringe(item, Fringe))
                     {
                         EvaluateNodeWithCost(item);
                         Fringe.Enqueue(item, item.PathTotal);
@@ -49,9 +51,9 @@ namespace NNUI1_01.AStarSearch
             }
         }
 
-        private void ReconstructPath(AStarNode node, Stack<AStarNode> path)
+        private void ReconstructPath(Node node, Stack<AStarNode> path)
         {
-            path.Push(node);
+            path.Push((AStarNode)node);
             if (node.Parent == null)
             {
                 return;
@@ -76,35 +78,11 @@ namespace NNUI1_01.AStarSearch
                 for (int j = 0; j < AStarSearchSystem.Columns; j++)
                 {
                     int currentNumber = item.State.Board[i, j];
-                    int[] positioinOfNumberInTarget = AStarSearchSystem.GetPositionOfNumberInTarget(currentNumber);
+                    int[] positioinOfNumberInTarget = AStarSearchSystem.GetPositionOfNumberInState(currentNumber, AStarSearchSystem.FinalState);
                     distance += Math.Abs(i - positioinOfNumberInTarget[0]) + Math.Abs(j - positioinOfNumberInTarget[1]);
                 }
             }
             item.PathEval = distance;
-        }
-
-        private bool ExistsInFringe(AStarNode searchingNode)
-        {
-            foreach (var node in Fringe)
-            {
-                if (searchingNode.Equals(node))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private bool ExistsInExplored(AStarNode searchingNode)
-        {
-            foreach (var node in Explored)
-            {
-                if (searchingNode.Equals(node))
-                {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 }

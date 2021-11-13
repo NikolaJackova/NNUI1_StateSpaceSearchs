@@ -1,62 +1,22 @@
 ﻿namespace NNUI1_01.IterativeDeepingSearch
 {
-    class IterativeDeepingNode
+    class IterativeDeepingNode : Node
     {
-        public int Id { get; set; }
-        public string Action { get; set; }
-        public IterativeDeepingNode Parent { get; set; }
-        public int[,] State { get; set; }
-        public int Depth { get; set; }
 
-        public IterativeDeepingNode(int id, string action, IterativeDeepingNode parent, int[,] state, int depth)
+        public IterativeDeepingNode(Action? action, IterativeDeepingNode parent, State state, int depth) :base(action, parent, state, depth)
         {
-            Id = id;
-            Action = action;
-            Parent = parent;
-            State = state;
-            Depth = depth;
         }
-
-        public IterativeDeepingNode(IterativeDeepingNode node)
+        public override Node CreateNewNodeFromOrigin(Action? action)
         {
-            State = new int[IterativeDeepingSearchSystem.Rows, IterativeDeepingSearchSystem.Columns];
-            for (int i = 0; i < IterativeDeepingSearchSystem.Rows; i++)
+            State state = new State(new int[State.Board.GetLength(0), State.Board.GetLength(1)]);
+            for (int i = 0; i < State.Board.GetLength(0); i++)
             {
-                for (int j = 0; j < IterativeDeepingSearchSystem.Columns; j++)
+                for (int j = 0; j < State.Board.GetLength(1); j++)
                 {
-                    State[i, j] = node.State[i, j];
+                    state.Board[i, j] = State.Board[i, j];
                 }
             }
-        }
-
-        public override string ToString()
-        {
-            string node = "-------------- -\n";
-            for (int i = 0; i < IterativeDeepingSearchSystem.Rows; i++)
-            {
-                for (int j = 0; j < IterativeDeepingSearchSystem.Columns; j++)
-                {
-                    node += State[i, j].ToString() + " ";
-                }
-                node += "\n";
-            }
-            return node;
-        }
-
-        public bool Equals(IterativeDeepingNode obj)
-        {
-            bool result = true;
-            for (int i = 0; i < IterativeDeepingSearchSystem.Rows; i++)
-            {
-                for (int j = 0; j < IterativeDeepingSearchSystem.Columns; j++)
-                {
-                    if (State[i, j] != obj.State[i, j])
-                    {
-                        result = false;
-                    }
-                }
-            }
-            return result;
+            return new IterativeDeepingNode(action, this, state, Depth + 1);
         }
     }
 }
