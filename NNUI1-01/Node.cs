@@ -23,7 +23,6 @@ namespace NNUI1_01
             State = state;
             Depth = depth;
         }
-
         public abstract Node CreateNewNodeFromOrigin(Action? action);
         public bool Equals(Node node)
         {

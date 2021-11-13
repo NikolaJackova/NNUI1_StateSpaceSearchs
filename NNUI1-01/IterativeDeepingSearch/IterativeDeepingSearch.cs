@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,9 +14,9 @@ namespace NNUI1_01.IterativeDeepingSearch
         public Stack<IterativeDeepingNode> Fringe { get; set; }
         public IList<IterativeDeepingNode> Path { get; set; }
         public IterativeDeepingNode InitNode { get; set; }
-        public IterativeDeepingSearch(IterativeDeepingNode initNode, State finalState)
+        public IterativeDeepingSearch(IterativeDeepingNode initNode, State finalState, int rows = 2, int columns = 3)
         {
-            IterativeDeepingSearchSystem = new SearchSystemController<IterativeDeepingNode>(finalState, 3);
+            IterativeDeepingSearchSystem = new SearchSystemController<IterativeDeepingNode>(finalState, rows, columns);
             Fringe = new Stack<IterativeDeepingNode>();
             Path = new List<IterativeDeepingNode>();
             Limit = 0;
@@ -23,12 +24,18 @@ namespace NNUI1_01.IterativeDeepingSearch
         }
         public void Search()
         {
+            Stack<IterativeDeepingNode> node;
             do
             {
-                DoIterative();
+                node = DoIterative();
             } while (Path.Count != 0);
+            if (node != null)
+            {
+                Stack<IterativeDeepingNode> path = new Stack<IterativeDeepingNode>();
+                //IterativeDeepingSearchSystem.ReconstructPath(node, path);
+            }
         }
-        public void DoIterative()
+        public Stack<IterativeDeepingNode> DoIterative()
         {
             int depth = 0;
             Path.Clear();
@@ -40,8 +47,9 @@ namespace NNUI1_01.IterativeDeepingSearch
                 IList<IterativeDeepingNode> children = IterativeDeepingSearchSystem.Successor(node);
                 foreach (var item in children)
                 {
-                    if (!SearchHelper.ExistsInList(item, Path))
+                    if (!Path.Any(nodeInCollection => item.Equals(nodeInCollection)) && !Fringe.Any(nodeInCollection => item.Equals(nodeInCollection)))
                     {
+                        
                         Fringe.Push(item);
                     }
                 }
@@ -50,11 +58,12 @@ namespace NNUI1_01.IterativeDeepingSearch
                     Console.WriteLine(node.ToString() + " " + depth);
                     Console.WriteLine("I find solution!");
                     Path.Clear();
-                    break;
+                    //return node;
                 }
                 depth++;
             }
             Limit++;
+            return null;
         }
     }
 }

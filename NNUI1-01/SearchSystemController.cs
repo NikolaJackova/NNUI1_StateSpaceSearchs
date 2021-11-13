@@ -1,5 +1,7 @@
-﻿using System;
+﻿using NNUI1_01.BreadthFirstSearch;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NNUI1_01
 {
@@ -10,8 +12,6 @@ namespace NNUI1_01
         public State FinalState { get; set; }
         public Action[] Actions { get; set; }
 
-        public SearchSystemController(State finalState, int rowsAndColumns) : this(finalState, rowsAndColumns, rowsAndColumns)
-        { }
         public SearchSystemController(State finalState, int rows, int columns)
         {
             FinalState = finalState;
@@ -125,6 +125,16 @@ namespace NNUI1_01
                 }
             }
             return position;
+        }
+
+        public void ReconstructPath(T node, Stack<T> path)
+        {
+            path.Push(node);
+            if (node.Parent == null)
+            {
+                return;
+            }
+            ReconstructPath((T)node.Parent, path);
         }
     }
 }

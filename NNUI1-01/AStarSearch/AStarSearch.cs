@@ -1,6 +1,7 @@
 ﻿using Priority_Queue;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NNUI1_01.AStarSearch
 {
@@ -11,26 +12,28 @@ namespace NNUI1_01.AStarSearch
         public AStarNode InitNode { get; set; }
         public IList<AStarNode> Explored { get; set; }
 
-        public AStarSearch(AStarNode initNode, State finalState)
+        private AStarNode finalNode;
+
+        public AStarSearch(AStarNode initNode, State finalState, int rows = 3, int columns = 3)
         {
-            AStarSearchSystem = new SearchSystemController<AStarNode>(finalState, 3);
+            AStarSearchSystem = new SearchSystemController<AStarNode>(finalState, rows, columns);
             InitNode = initNode;
             Fringe = new SimplePriorityQueue<AStarNode>();
             Explored = new List<AStarNode>();
         }
 
-        public void Search()
+        public Stack<AStarNode> Search()
         {
             int iteration = 0;
             Fringe.Enqueue(InitNode, InitNode.PathTotal);
-            while (true)
+            while (Fringe.Count != 0)
             {
                 AStarNode node = Fringe.Dequeue();
                 Explored.Add(node);
                 IList<AStarNode> children = AStarSearchSystem.Successor(node);
                 foreach (var item in children)
                 {
-                    if (!SearchHelper.ExistsInList(item, Explored) && !SearchHelper.ExistsInFringe(item, Fringe))
+                    if (!Explored.Any(nodeInCollection => item.Equals(nodeInCollection)) && !Fringe.Any(nodeInCollection => item.Equals(nodeInCollection)))
                     {
                         EvaluateNodeWithCost(item);
                         Fringe.Enqueue(item, item.PathTotal);
@@ -39,35 +42,13 @@ namespace NNUI1_01.AStarSearch
                 if (AStarSearchSystem.IsFinalState(node))
                 {
                     EvaluateNodeWithCost(node);
-                    Console.WriteLine(node.ToString() + " ");
-                    Console.WriteLine("I find solution! " + iteration++);
-                    Stack<AStarNode> path = new Stack<AStarNode>();
-                    ReconstructPath(node, path);
-                    WritePath(path);
-                    break;
+                    Stack<AStarNode> aStarNodePath = new Stack<AStarNode>();
+                    AStarSearchSystem.ReconstructPath(node, aStarNodePath);
+                    return aStarNodePath;
                 }
                 iteration++;
-                Console.WriteLine(node.ToString());
             }
-        }
-
-        private void ReconstructPath(Node node, Stack<AStarNode> path)
-        {
-            path.Push((AStarNode)node);
-            if (node.Parent == null)
-            {
-                return;
-            }
-            ReconstructPath(node.Parent, path);
-        }
-
-        private void WritePath(Stack<AStarNode> path)
-        {
-            foreach (var item in path)
-            {
-                Console.WriteLine(item.ToString());
-            }
-            Console.WriteLine("Total lenght of path: " + path.Count);
+            return null;
         }
 
         private void EvaluateNodeWithCost(AStarNode item)
