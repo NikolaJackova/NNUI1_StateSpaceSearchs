@@ -1,34 +1,39 @@
 ﻿using Priority_Queue;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NNUI1_01.AStarSearch
 {
     class AStarSearch
     {
-        public AStarSearchSystem AStarSearchSystem { get; set; }
+        public SearchSystemController<AStarNode> AStarSearchSystem { get; set; }
         public SimplePriorityQueue<AStarNode> Fringe { get; set; }
+        public AStarNode InitNode { get; set; }
         public IList<AStarNode> Explored { get; set; }
 
-        public AStarSearch(AStarNode initNode, State finalState)
+        private AStarNode finalNode;
+
+        public AStarSearch(AStarNode initNode, State finalState, int rows = 3, int columns = 3)
         {
-            AStarSearchSystem = new AStarSearchSystem(initNode, finalState, (Action[]) Enum.GetValues(typeof(Action)));
+            AStarSearchSystem = new SearchSystemController<AStarNode>(finalState, rows, columns);
+            InitNode = initNode;
             Fringe = new SimplePriorityQueue<AStarNode>();
             Explored = new List<AStarNode>();
         }
 
-        public void Search()
+        public Stack<AStarNode> Search(out int iteration)
         {
-            int iteration = 0;
-            Fringe.Enqueue(AStarSearchSystem.InitNode, AStarSearchSystem.InitNode.PathTotal);
-            while (true)
+            iteration = 0;
+            Fringe.Enqueue(InitNode, InitNode.PathTotal);
+            while (Fringe.Count != 0)
             {
                 AStarNode node = Fringe.Dequeue();
                 Explored.Add(node);
                 IList<AStarNode> children = AStarSearchSystem.Successor(node);
                 foreach (var item in children)
                 {
-                    if (!ExistsInExplored(item) && !ExistsInFringe(item))
+                    if (!Explored.Any(nodeInCollection => item.Equals(nodeInCollection)) && !Fringe.Any(nodeInCollection => item.Equals(nodeInCollection)))
                     {
                         EvaluateNodeWithCost(item);
                         Fringe.Enqueue(item, item.PathTotal);
@@ -37,35 +42,13 @@ namespace NNUI1_01.AStarSearch
                 if (AStarSearchSystem.IsFinalState(node))
                 {
                     EvaluateNodeWithCost(node);
-                    Console.WriteLine(node.ToString() + " ");
-                    Console.WriteLine("I find solution! " + iteration++);
-                    Stack<AStarNode> path = new Stack<AStarNode>();
-                    ReconstructPath(node, path);
-                    WritePath(path);
-                    break;
+                    Stack<AStarNode> aStarNodePath = new Stack<AStarNode>();
+                    AStarSearchSystem.ReconstructPath(node, aStarNodePath);
+                    return aStarNodePath;
                 }
                 iteration++;
-                Console.WriteLine(node.ToString());
             }
-        }
-
-        private void ReconstructPath(AStarNode node, Stack<AStarNode> path)
-        {
-            path.Push(node);
-            if (node.Parent == null)
-            {
-                return;
-            }
-            ReconstructPath(node.Parent, path);
-        }
-
-        private void WritePath(Stack<AStarNode> path)
-        {
-            foreach (var item in path)
-            {
-                Console.WriteLine(item.ToString());
-            }
-            Console.WriteLine("Total lenght of path: " + path.Count);
+            return null;
         }
 
         private void EvaluateNodeWithCost(AStarNode item)
@@ -76,35 +59,11 @@ namespace NNUI1_01.AStarSearch
                 for (int j = 0; j < AStarSearchSystem.Columns; j++)
                 {
                     int currentNumber = item.State.Board[i, j];
-                    int[] positioinOfNumberInTarget = AStarSearchSystem.GetPositionOfNumberInTarget(currentNumber);
+                    int[] positioinOfNumberInTarget = AStarSearchSystem.GetPositionOfNumberInState(currentNumber, AStarSearchSystem.FinalState);
                     distance += Math.Abs(i - positioinOfNumberInTarget[0]) + Math.Abs(j - positioinOfNumberInTarget[1]);
                 }
             }
             item.PathEval = distance;
-        }
-
-        private bool ExistsInFringe(AStarNode searchingNode)
-        {
-            foreach (var node in Fringe)
-            {
-                if (searchingNode.Equals(node))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private bool ExistsInExplored(AStarNode searchingNode)
-        {
-            foreach (var node in Explored)
-            {
-                if (searchingNode.Equals(node))
-                {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 }

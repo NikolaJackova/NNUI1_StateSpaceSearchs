@@ -8,9 +8,9 @@ namespace NNUI1_01
 {
     enum Action
     {
-        UP,
+        RIGHT,
         DOWN,
         LEFT,
-        RIGHT
+        UP
     }
 }

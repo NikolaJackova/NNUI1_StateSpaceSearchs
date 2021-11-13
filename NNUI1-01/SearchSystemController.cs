@@ -1,27 +1,25 @@
-﻿using System;
+﻿using NNUI1_01.BreadthFirstSearch;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace NNUI1_01.AStarSearch
+namespace NNUI1_01
 {
-    class AStarSearchSystem
+    class SearchSystemController<T> where T : Node
     {
-        public readonly static int Rows = 3;
-        public readonly static int Columns = 3;
-        public AStarNode InitNode { get; set; }
+        public readonly int Rows;
+        public readonly int Columns;
         public State FinalState { get; set; }
         public Action[] Actions { get; set; }
 
-        public AStarSearchSystem(AStarNode initNode, State finalState, Action[] actions)
+        public SearchSystemController(State finalState, int rows, int columns)
         {
-            InitNode = initNode;
             FinalState = finalState;
-            Actions = actions;
+            Rows = rows;
+            Columns = columns;
+            Actions = (Action[])Enum.GetValues(typeof(Action));
         }
-
-        public bool IsFinalState(AStarNode node)
+        public bool IsFinalState(Node node)
         {
             for (int i = 0; i < Rows; i++)
             {
@@ -35,23 +33,7 @@ namespace NNUI1_01.AStarSearch
             }
             return true;
         }
-
-        public IList<AStarNode> Successor(AStarNode node)
-        {
-            IList<AStarNode> nodes = new List<AStarNode>();
-            for (int i = 0; i < Actions.Length; i++)
-            {
-                int[] locationOfZero = GetPositionOfNumberInState(0, node.State);
-                Action action = Actions[i];
-                if (IsValidAction(action, locationOfZero))
-                {
-                    nodes.Add(ApplyAction(action, node, locationOfZero));
-                }
-            }
-            return nodes;
-        }
-
-        private bool IsValidAction(Action action, int[] locationOfZero)
+        public bool IsValidAction(Action action, int[] locationOfZero)
         {
             bool isValid = true;
             switch (action)
@@ -84,9 +66,9 @@ namespace NNUI1_01.AStarSearch
             return isValid;
         }
 
-        private AStarNode ApplyAction(Action action, AStarNode nodeOrigin, int[] locationOfZero)
+        public Node ApplyAction(Action action, Node nodeOrigin, int[] locationOfZero)
         {
-            AStarNode node = new AStarNode(nodeOrigin, action);
+            Node node = nodeOrigin.CreateNewNodeFromOrigin(action);
             int x = locationOfZero[0];
             int y = locationOfZero[1];
             int temp = node.State.Board[x, y];
@@ -113,11 +95,22 @@ namespace NNUI1_01.AStarSearch
             }
             return node;
         }
-        public int[] GetPositionOfNumberInTarget(int currentNumber)
+        public IList<T> Successor(T node)
         {
-            return GetPositionOfNumberInState(currentNumber, FinalState);
+            IList<T> nodes = new List<T>();
+            for (int i = 0; i < Actions.Length; i++)
+            {
+                int[] locationOfZero = GetPositionOfNumberInState(0, node.State);
+                Action action = Actions[i];
+                if (IsValidAction(action, locationOfZero))
+                {
+                    nodes.Add((T)ApplyAction(action, node, locationOfZero));
+                }
+            }
+            return nodes;
         }
-        private int[] GetPositionOfNumberInState(int currentNumber, State state)
+
+        public int[] GetPositionOfNumberInState(int currentNumber, State state)
         {
             int[] position = new int[2];
             for (int i = 0; i < Rows; i++)
@@ -132,6 +125,16 @@ namespace NNUI1_01.AStarSearch
                 }
             }
             return position;
+        }
+
+        public void ReconstructPath(T node, Stack<T> path)
+        {
+            path.Push(node);
+            if (node.Parent == null)
+            {
+                return;
+            }
+            ReconstructPath((T)node.Parent, path);
         }
     }
 }
