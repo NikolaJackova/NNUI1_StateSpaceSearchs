@@ -24,6 +24,18 @@ namespace NNUI1_01
             Depth = depth;
         }
         public abstract Node CreateNewNodeFromOrigin(Action? action);
+        public State DeepCopyState()
+        {
+            State state = new State(new int[State.Board.GetLength(0), State.Board.GetLength(1)]);
+            for (int i = 0; i < State.Board.GetLength(0); i++)
+            {
+                for (int j = 0; j < State.Board.GetLength(1); j++)
+                {
+                    state.Board[i, j] = State.Board[i, j];
+                }
+            }
+            return state;
+        }
         public bool Equals(Node node)
         {
             return State.Equals(node.State);

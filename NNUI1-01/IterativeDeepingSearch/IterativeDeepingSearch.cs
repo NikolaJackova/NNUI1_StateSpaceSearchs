@@ -22,21 +22,19 @@ namespace NNUI1_01.IterativeDeepingSearch
             Limit = 0;
             InitNode = initNode;
         }
-        public void Search()
+        public Stack<IterativeDeepingNode> Search(out int iteration)
         {
-            Stack<IterativeDeepingNode> node;
+            iteration = 0;
+            Stack<IterativeDeepingNode> recontructedPath;
             do
             {
-                node = DoIterative();
-            } while (Path.Count != 0);
-            if (node != null)
-            {
-                Stack<IterativeDeepingNode> path = new Stack<IterativeDeepingNode>();
-                //IterativeDeepingSearchSystem.ReconstructPath(node, path);
-            }
+                recontructedPath = DoIterative(ref iteration, out iteration);
+            } while (recontructedPath == null);
+            return recontructedPath;
         }
-        public Stack<IterativeDeepingNode> DoIterative()
+        private Stack<IterativeDeepingNode> DoIterative(ref int iteration, out int outIteration)
         {
+            outIteration = iteration;
             int depth = 0;
             Path.Clear();
             Fringe.Push(InitNode);
@@ -55,12 +53,12 @@ namespace NNUI1_01.IterativeDeepingSearch
                 }
                 if (IterativeDeepingSearchSystem.IsFinalState(node))
                 {
-                    Console.WriteLine(node.ToString() + " " + depth);
-                    Console.WriteLine("I find solution!");
-                    Path.Clear();
-                    //return node;
+                    Stack<IterativeDeepingNode> iterativeDeepingSearchPath = new Stack<IterativeDeepingNode>();
+                    IterativeDeepingSearchSystem.ReconstructPath(node, iterativeDeepingSearchPath);
+                    return iterativeDeepingSearchPath;
                 }
                 depth++;
+                iteration++;
             }
             Limit++;
             return null;

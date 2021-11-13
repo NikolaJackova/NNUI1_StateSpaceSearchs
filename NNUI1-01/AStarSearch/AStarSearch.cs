@@ -22,9 +22,9 @@ namespace NNUI1_01.AStarSearch
             Explored = new List<AStarNode>();
         }
 
-        public Stack<AStarNode> Search()
+        public Stack<AStarNode> Search(out int iteration)
         {
-            int iteration = 0;
+            iteration = 0;
             Fringe.Enqueue(InitNode, InitNode.PathTotal);
             while (Fringe.Count != 0)
             {

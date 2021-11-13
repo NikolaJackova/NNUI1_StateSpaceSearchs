@@ -20,9 +20,9 @@ namespace NNUI1_01.BreadthFirstSearch
             InitNode = initNode;
         }
 
-        public Stack<BreadthFirstSearchNode> Search()
+        public Stack<BreadthFirstSearchNode> Search(out int iteration)
         {
-            int iteration = 0;
+            iteration = 0;
             Fringe.Enqueue(InitNode);
             while (Fringe.Count != 0)
             {

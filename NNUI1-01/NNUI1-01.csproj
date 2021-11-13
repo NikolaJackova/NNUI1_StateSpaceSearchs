@@ -51,6 +51,8 @@
     <Compile Include="AStarSearch\AStarNode.cs" />
     <Compile Include="BreadthFirstSearch\BreadthFirstSearch.cs" />
     <Compile Include="BreadthFirstSearch\BreadthFirstSearchNode.cs" />
+    <Compile Include="DepthFirstSearch\DepthFirstSearch.cs" />
+    <Compile Include="DepthFirstSearch\DepthFirstSearchNode.cs" />
     <Compile Include="IterativeDeepingSearch\IterativeDeepingSearch.cs" />
     <Compile Include="IterativeDeepingSearch\IterativeDeepingNode.cs" />
     <Compile Include="Node.cs" />

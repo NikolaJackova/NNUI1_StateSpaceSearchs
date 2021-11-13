@@ -16,15 +16,7 @@ namespace NNUI1_01.AStarSearch
         }
         public override Node CreateNewNodeFromOrigin(Action? action)
         {
-            State state = new State(new int[State.Board.GetLength(0), State.Board.GetLength(1)]);
-            for (int i = 0; i < State.Board.GetLength(0); i++)
-            {
-                for (int j = 0; j < State.Board.GetLength(1); j++)
-                {
-                    state.Board[i, j] = State.Board[i, j];
-                }
-            }
-            return new AStarNode(action, this, state, Depth + 1);
+            return new AStarNode(action, this, DeepCopyState(), Depth + 1);
         }
         public override string ToString()
         {
