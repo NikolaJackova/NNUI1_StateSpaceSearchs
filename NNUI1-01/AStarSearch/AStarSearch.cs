@@ -12,8 +12,6 @@ namespace NNUI1_01.AStarSearch
         public AStarNode InitNode { get; set; }
         public IList<AStarNode> Explored { get; set; }
 
-        private AStarNode finalNode;
-
         public AStarSearch(AStarNode initNode, State finalState, int rows = 3, int columns = 3)
         {
             AStarSearchSystem = new SearchSystemController<AStarNode>(finalState, rows, columns);
