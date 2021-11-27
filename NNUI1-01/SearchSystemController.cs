@@ -21,17 +21,7 @@ namespace NNUI1_01
         }
         public bool IsFinalState(Node node)
         {
-            for (int i = 0; i < Rows; i++)
-            {
-                for (int j = 0; j < Columns; j++)
-                {
-                    if (!(FinalState.Board[i, j] == node.State.Board[i, j]))
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
+            return FinalState.Equals(node.State);
         }
         public bool IsValidAction(Action action, int[] locationOfZero)
         {
