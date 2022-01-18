@@ -28,6 +28,12 @@ namespace NNUI1_01.DepthFirstSearch
             {
                 DepthFirstSearchNode node = Fringe.Pop();
                 Explored.Add(node);
+                if (DepthFirstSearchSystem.IsFinalState(node))
+                {
+                    Stack<DepthFirstSearchNode> breadthFirstSearchPath = new Stack<DepthFirstSearchNode>();
+                    DepthFirstSearchSystem.ReconstructPath(node, breadthFirstSearchPath);
+                    return breadthFirstSearchPath;
+                }
                 IList<DepthFirstSearchNode> children = DepthFirstSearchSystem.Successor(node);
                 foreach (var item in children)
                 {
@@ -35,12 +41,6 @@ namespace NNUI1_01.DepthFirstSearch
                     {
                         Fringe.Push(item);
                     }
-                }
-                if (DepthFirstSearchSystem.IsFinalState(node))
-                {
-                    Stack<DepthFirstSearchNode> breadthFirstSearchPath = new Stack<DepthFirstSearchNode>();
-                    DepthFirstSearchSystem.ReconstructPath(node, breadthFirstSearchPath);
-                    return breadthFirstSearchPath;
                 }
                 iteration++;
             }

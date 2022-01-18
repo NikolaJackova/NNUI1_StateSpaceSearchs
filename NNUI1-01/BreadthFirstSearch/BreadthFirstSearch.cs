@@ -28,6 +28,12 @@ namespace NNUI1_01.BreadthFirstSearch
             {
                 BreadthFirstSearchNode node = Fringe.Dequeue();
                 Explored.Add(node);
+                if (BreadthFirstSearchSystem.IsFinalState(node))
+                {
+                    Stack<BreadthFirstSearchNode> breadthFirstSearchPath = new Stack<BreadthFirstSearchNode>();
+                    BreadthFirstSearchSystem.ReconstructPath(node, breadthFirstSearchPath);
+                    return breadthFirstSearchPath;
+                }
                 IList<BreadthFirstSearchNode> children = BreadthFirstSearchSystem.Successor(node);
                 foreach (var item in children)
                 {
@@ -35,12 +41,6 @@ namespace NNUI1_01.BreadthFirstSearch
                     {
                         Fringe.Enqueue(item);
                     }
-                }
-                if (BreadthFirstSearchSystem.IsFinalState(node))
-                {
-                    Stack<BreadthFirstSearchNode> breadthFirstSearchPath = new Stack<BreadthFirstSearchNode>();
-                    BreadthFirstSearchSystem.ReconstructPath(node, breadthFirstSearchPath);
-                    return breadthFirstSearchPath;
                 }
                 iteration++;
             }

@@ -28,6 +28,13 @@ namespace NNUI1_01.AStarSearch
             {
                 AStarNode node = Fringe.Dequeue();
                 Explored.Add(node);
+                if (AStarSearchSystem.IsFinalState(node))
+                {
+                    EvaluateNodeWithCost(node);
+                    Stack<AStarNode> aStarNodePath = new Stack<AStarNode>();
+                    AStarSearchSystem.ReconstructPath(node, aStarNodePath);
+                    return aStarNodePath;
+                }
                 IList<AStarNode> children = AStarSearchSystem.Successor(node);
                 foreach (var item in children)
                 {
@@ -36,13 +43,6 @@ namespace NNUI1_01.AStarSearch
                         EvaluateNodeWithCost(item);
                         Fringe.Enqueue(item, item.PathTotal);
                     }
-                }
-                if (AStarSearchSystem.IsFinalState(node))
-                {
-                    EvaluateNodeWithCost(node);
-                    Stack<AStarNode> aStarNodePath = new Stack<AStarNode>();
-                    AStarSearchSystem.ReconstructPath(node, aStarNodePath);
-                    return aStarNodePath;
                 }
                 iteration++;
             }

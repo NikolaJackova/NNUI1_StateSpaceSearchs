@@ -42,6 +42,12 @@ namespace NNUI1_01.IterativeDeepingSearch
             {
                 IterativeDeepingNode node = Fringe.Pop();
                 Path.Add(node);
+                if (IterativeDeepingSearchSystem.IsFinalState(node))
+                {
+                    Stack<IterativeDeepingNode> iterativeDeepingSearchPath = new Stack<IterativeDeepingNode>();
+                    IterativeDeepingSearchSystem.ReconstructPath(node, iterativeDeepingSearchPath);
+                    return iterativeDeepingSearchPath;
+                }
                 IList<IterativeDeepingNode> children = IterativeDeepingSearchSystem.Successor(node);
                 foreach (var item in children)
                 {
@@ -50,12 +56,6 @@ namespace NNUI1_01.IterativeDeepingSearch
                         
                         Fringe.Push(item);
                     }
-                }
-                if (IterativeDeepingSearchSystem.IsFinalState(node))
-                {
-                    Stack<IterativeDeepingNode> iterativeDeepingSearchPath = new Stack<IterativeDeepingNode>();
-                    IterativeDeepingSearchSystem.ReconstructPath(node, iterativeDeepingSearchPath);
-                    return iterativeDeepingSearchPath;
                 }
                 depth++;
                 iteration++;
